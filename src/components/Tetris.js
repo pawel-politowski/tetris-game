@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { createStage } from '../gameHelpers';
+import { createStage, checkCollision } from '../gameHelpers';
 
 import Stage from './Stage';
 import Display from './Display';
@@ -19,16 +19,27 @@ const Tetris = () => {
     const [stage, setStage] = useStage(player, resetPlayer);
 
     const movePlayer = dir => {
+        if (!checkCollision(player, stage, { x: dir, y: 0 })){
         updatePlayerPos({ x: dir, y: 0 })
+        }
     };
 
     const startGame = () => {
         setStage(createStage());
         resetPlayer();
+        setGameOver(false);
     };
 
     const drop = () => {
+        if (!checkCollision(player, stage, { x: 0, y: 1})) {
         updatePlayerPos({ x: 0, y: 1, collided: false })
+        } else {
+            if (player.pos.y < 1) {
+                setGameOver(true);
+                setDropTime(null);
+            }
+            updatePlayerPos({ x: 0, y: 0, collided: true })
+        }
     };
 
     const dropPlayer = () => {
